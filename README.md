@@ -1,2 +1,3 @@
 # space-donkey
-quadrigacx scala api
+scala akka streams quadrigacx API wrappers.
+
