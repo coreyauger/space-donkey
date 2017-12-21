@@ -1,30 +1,18 @@
 package io.surfkit.spacedonkey.flows
 
 import java.util.UUID
-
-import akka.http.scaladsl.model.headers.{Authorization, OAuth2BearerToken}
 import akka.stream.{KillSwitches, Materializer}
 import akka.NotUsed
 import akka.actor.{ActorSystem, Cancellable}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding
 import akka.http.scaladsl.model._
-import akka.stream.scaladsl.{Keep, Source}
-import akka.util.ByteString
+import akka.stream.scaladsl.Source
 import io.surfkit.spacedonkey.utils.EncoderUtil
-
-import scala.concurrent.Future
-import org.joda.time.DateTimeZone
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, Writes}
-
+import play.api.libs.json.Json
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
-
-/**
-  * Created by suroot on 03/10/17.
-  */
-
 
 class QuadrigacxPoller(path: String, interval: FiniteDuration, fuzz: Double, alignMinute: Boolean = true)(implicit system: ActorSystem, materializer: Materializer) {
   import scala.concurrent.duration._
@@ -45,10 +33,7 @@ class QuadrigacxPoller(path: String, interval: FiniteDuration, fuzz: Double, ali
 
   def apply(): Source[Try[HttpResponse], Cancellable] = sourceWithDest.via(sharedKillSwitch.flow)
   def shutdown = sharedKillSwitch.shutdown()
-
 }
-
-
 
 class QuadrigacxSignedRequester(clientId: String, apiKey: String, apiSecret: String)(implicit system: ActorSystem, materializer: Materializer){
   import system.dispatcher

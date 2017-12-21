@@ -7,26 +7,14 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
-
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import java.io.{File, PrintWriter}
-import java.net.URL
-
+import scala.concurrent.{ExecutionContext, Future}
+import java.io.File
 import com.typesafe.config._
 
-import scala.util.Try
 
-/**
-  * Created by suroot on 03/10/17.
-  */
 object Quadrigacx {
-
-  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"
-  implicit val dateFormat = Format[DateTime](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
-
   sealed trait CX
 
   case class Market(major: String, minor: String) extends CX{
@@ -56,9 +44,7 @@ object Quadrigacx {
   implicit val TradeWrites = Json.writes[Trade]
   implicit val TradeReads = Json.reads[Trade]
 
-
   trait Private extends CX
-
 
   case class MyOrders(
                        btc_cad: Option[Seq[Order]],
@@ -104,8 +90,6 @@ object Quadrigacx {
   implicit val SellOrderRequestReads = Json.reads[SellOrderRequest]
 }
 
-
-
 class QuadrigacxTicker[T <: Quadrigacx.CX](market: Quadrigacx.Market, interval: FiniteDuration, fuzz: Double = 6.66)(implicit system: ActorSystem, materializer: Materializer, um: Reads[T]) extends QuadrigacxPoller(
   path = s"public/trades?book=${market}", interval = interval, fuzz = fuzz) with PlayJsonSupport{
   def json(): Source[Future[Seq[T]], Cancellable] = super.apply().map{
@@ -133,7 +117,6 @@ case class QuadrigacxOneHourTicker(market: Quadrigacx.Market, fuzz: Double = 6.6
 class QuadrigacxApi(creds: File)(implicit system: ActorSystem, materializer: Materializer, ex: ExecutionContext) extends PlayJsonSupport {
 
   val config = ConfigFactory.parseFile(creds)
-
 
   val apiKey = config.getString("Quadrigacx.apiKey")
   val apiSecret = config.getString("Quadrigacx.apiSecret")
