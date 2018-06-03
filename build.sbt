@@ -1,8 +1,4 @@
-import SonatypeKeys._
-
 import sbt.Keys._
-
-sonatypeSettings
 
 name := "space-donkey"
 
@@ -31,10 +27,6 @@ lazy val deps = {
     "de.heikoseeberger"       %% "akka-http-play-json"        % "1.17.0"
   )
 }
-
-dependencyOverrides ++= Set(
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.4"
-)
 
 homepage := Some(url("http://www.surfkit.io/"))
 
